@@ -15,53 +15,35 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void createUsersTable() throws SQLException {
-        Statement statement = null;
-        Connection connection = Util.getConnection();
         String sql = "CREATE TABLE IF NOT EXISTS `mydbtest`.`users` (\n" +
                 "  `id` INT NOT NULL AUTO_INCREMENT,\n" +
                 "  `name` VARCHAR(45) NULL,\n" +
                 "  `lastName` VARCHAR(45) NULL,\n" +
                 "  `age` INT NULL,\n" +
                 "  PRIMARY KEY (`id`));";
-        try {
-            statement = Util.getConnection().createStatement();
+        try (PreparedStatement statement = Util.getConnection().prepareStatement(sql); Connection connection = Util.getConnection()){
             statement.execute(sql);
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }finally {
-            if (statement != null){
-                statement.close();
-            }
-            if (connection != null){
-                connection.close();
-            }
         }
     }
 
     public void dropUsersTable() throws SQLException {
-        Statement statement = null;
+
         String sql = "DROP TABLE IF EXISTS users;";
-        Connection connection = Util.getConnection();
-        try {
-            statement = connection.createStatement();
+
+        try (Statement statement = Util.getConnection().prepareStatement(sql); Connection connection = Util.getConnection()){
+
             statement.execute(sql);
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }finally {
-            if (statement != null){
-                statement.close();
-            }
-            if (connection != null){
-                connection.close();
-            }
         }
     }
 
     public void saveUser(String name, String lastName, byte age) throws SQLException {
         String sql = "INSERT INTO users(name, lastName, age) values (?,?,?);";
-        Connection connection = Util.getConnection();
 
-        try (PreparedStatement preparedStatement = Util.getConnection().prepareStatement(sql)){
+        try (PreparedStatement preparedStatement = Util.getConnection().prepareStatement(sql); Connection connection = Util.getConnection()){
             preparedStatement.setString(1,name);
             preparedStatement.setString(2,lastName);
             preparedStatement.setByte(3,age);
@@ -69,11 +51,8 @@ public class UserDaoJDBCImpl implements UserDao {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }finally {
-            if (connection != null){
-                connection.close();
-            }
         }
+
 
     }
 
